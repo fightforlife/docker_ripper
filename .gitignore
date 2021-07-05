@@ -18,3 +18,5 @@ venv
 # PyCharm
 .idea
 .eggs
+config/**
+rips/**
