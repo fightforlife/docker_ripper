@@ -1,0 +1,33 @@
+version: '3.3'
+services:
+  docker-ripper:
+    image: edgd1er/docker-ripper:latest
+    container_name: Ripper
+    ports:
+      - "9191:9090"
+    environment:
+      LOGIN: "john"
+      PASS: "doe"
+      PREFIX: ''
+      DEBUG: 'False'
+      TZ: "America/Chicago"
+      NOTIFICATION_ON: "n"
+      EMAIL_SENDER: 'YOUR_EMAIL'
+      EMAIL_RECIPIENTS: 'DEST_EMAIL'
+      EMAIL_PASSWORD: 'YOUR_PASSWORD'
+      EMAIL_SERVER: 'smtp.gmail.com'
+      EMAIL_SERVER_PORT: '587'
+      EMAIL_DEBUG_LEVEL: '0'
+      # Push notification parameters (Pushover)
+      PUSHOVER_APP_TOKEN: 'YOUR_APP_TOKEN'
+      USER_KEY: 'YOUR_USER_KEY'
+      # Push notification parameters (Pushbullet)
+      PUSHBULLET_APP_TOKEN: 'YOUR_APP_TOKEN'
+      #NUID: 99 # optional, set new user id
+      #NGID: 100 Optional, set new group id
+    privileged: true
+    volumes:
+      - '/path/to/config/:/config:rw'
+      - '/path/to/rips/:/out:rw'
+    devices:
+      - '/dev/sr0:/dev/sr0'

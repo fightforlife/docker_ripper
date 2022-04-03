@@ -20,3 +20,4 @@ venv
 .eggs
 config/**
 rips/**
+/docker-compose.yml

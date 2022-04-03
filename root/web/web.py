@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Ripper Web UI
-# Projekt von https://github.com/rix1337
+# Project of https://github.com/rix1337
 
 """Ripper.
 
@@ -10,6 +10,7 @@ Usage:
          [--log=<LOGFILE>]
          [--user=<USERNAME>]
          [--pass=<PASSWORD>]
+         [--debug=<True|False>]
 
 Options:
   --port=<PORT>          Set the webserver's port
@@ -17,6 +18,7 @@ Options:
   --log=<LOGFILE>        Set the location of the log file
   --user=<USERNAME>      Set the username for webserver (requires pass to be set)
   --pass=<PASSWORD>      Set the password for webserver (requires username to be set)
+  --debug=<True|False>   enable debug mode
 """
 
 import base64
@@ -74,6 +76,8 @@ def app_container():
     arguments = docopt(__doc__, version='Ripper')
 
     base_dir = '.'
+    debug = False
+    debug = os.getenv('DEBUG', False)
 
     app = Flask(__name__, template_folder=os.path.join(base_dir, 'web'))
     app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -96,6 +100,8 @@ def app_container():
         log_file = "/config/Ripper.log"
 
     def check_auth(username, password):
+        if debug:
+            print(f'user: {username} == {arguments["--user"]}, pass: {password} == {arguments["--pass"]}')
         return username == arguments['--user'] and password == arguments['--pass']
 
     def authenticate():
@@ -155,18 +161,18 @@ def app_container():
                         "large_file": filesize > 1000000
                     }
                 )
-            except:
+            except OSError:
                 return "Failed", 400
         elif request.method == 'DELETE':
             try:
                 open(log_file, 'w').close()
                 return "Success", 200
-            except:
-                return "Logfile not found", 400
+            except OSError:
+                return "Failed", 400
         else:
             return "Failed", 405
 
-    print("Ripper web log available on Port 9090")
+    print("Ripper web log available on Port "+ port)
     serve(app, host='0.0.0.0', port=port, threads=10, _quiet=True)
 
 
