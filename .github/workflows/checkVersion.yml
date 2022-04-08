@@ -14,7 +14,7 @@ jobs:
       - name: get latest version
         id: getlatestversion
         run: |
-          ver=$(curl -s "http://www.makemkv.com/download/" | grep -Eom1 "MakeMKV [0-9].[0-9]+\.[0-9]+" | sed 's/MakeMKV //')
+          ver=$(curl -s "http://www.makemkv.com/download/" | grep -Eom1 "MakeMKV [0-9].[0-9]+\.[0-9]+" | sed -r 's/MakeMKV v?//')
           echo "mkv build version: ${{ env.MKVVERSION }}, latest mkv version: ${ver}"
           if [[ ${{ env.MKVVERSION }} != ${ver} ]]; then exit 1; fi
 

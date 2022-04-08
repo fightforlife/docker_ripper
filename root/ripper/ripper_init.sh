@@ -32,7 +32,7 @@ setTimeZone() {
 }
 
 getVersion() {
-  echo "latest version:   $(curl -s http://www.makemkv.com/download/ | grep -Eom1 "MakeMKV 1.[0-9]+\.[0-9]+")"
+  echo "latest version:   $(curl -s http://www.makemkv.com/download/ | grep -Eom1 \"MakeMKV v?1.[0-9]+\.[0-9]+\")"
   echo "installed version: $(makemkvcon info | head -n1)"
 }
 
@@ -91,5 +91,6 @@ chown -R nobody:users /config
 chmod -R g+rw /config
 
 chmod +x /config/ripper.sh
+#makemkvcon reg
 
 supervisorctl start ripper

@@ -6,12 +6,13 @@ services:
     ports:
       - "9191:9090"
     environment:
-      LOGIN: "john"
-      PASS: "doe"
-      PREFIX: ''
+      LOGIN: "john" # web ui login
+      PASS: "doe"   # web ui pass
+      PREFIX: ''    # web ui prefix
       DEBUG: 'False'
       TZ: "America/Chicago"
-      NOTIFICATION_ON: "n"
+      MKV_KEY: "" # Makeversion registration key, if empty fetch beta key in mkv forum
+      NOTIFICATION_ON: "n" #Optional, default n, activate notification whene ripped. (email, pushbullet, pushover)
       EMAIL_SENDER: 'YOUR_EMAIL'
       EMAIL_RECIPIENTS: 'DEST_EMAIL'
       EMAIL_PASSWORD: 'YOUR_PASSWORD'
@@ -25,9 +26,9 @@ services:
       PUSHBULLET_APP_TOKEN: 'YOUR_APP_TOKEN'
       #NUID: 99 # optional, set new user id
       #NGID: 100 Optional, set new group id
-    privileged: true
+    privileged: true # optional - only use when your drive is not detected inside the container
     volumes:
-      - '/path/to/config/:/config:rw'
-      - '/path/to/rips/:/out:rw'
+      - '/path/to/config/:/config:rw' # ripper conf
+      - '/path/to/rips/:/out:rw'      # ripper's output dir.
     devices:
       - '/dev/sr0:/dev/sr0'
