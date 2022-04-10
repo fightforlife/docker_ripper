@@ -32,7 +32,7 @@ setTimeZone() {
 }
 
 getVersion() {
-  echo "latest version:   $(curl -s http://www.makemkv.com/download/ | grep -Eom1 \"MakeMKV v?1.[0-9]+\.[0-9]+\")"
+  echo "latest version:   $(curl -s http://www.makemkv.com/download/ | grep -Eom1 'MakeMKV v?1.[0-9]+\.[0-9]+')"
   echo "installed version: $(makemkvcon info | head -n1)"
 }
 

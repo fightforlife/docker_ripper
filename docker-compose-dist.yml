@@ -1,8 +1,8 @@
 version: '3.3'
 services:
-  docker-ripper:
+  ripper:
     image: edgd1er/docker-ripper:latest
-    container_name: Ripper
+    container_name: ripper
     ports:
       - "9191:9090"
     environment:
