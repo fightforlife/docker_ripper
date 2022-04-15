@@ -21,3 +21,4 @@ venv
 config/**
 rips/**
 /docker-compose.yml
+/MKV_KEY

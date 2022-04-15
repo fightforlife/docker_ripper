@@ -64,21 +64,31 @@ setNotificationConfig
 
 # fetching MakeMKV beta key
 KEY=$(curl --silent 'https://forum.makemkv.com/forum/viewtopic.php?f=5&t=1053' | grep -oP 'T-[\w\d@]{66}')
-MKV_KEY=${MKV_KEY:-${KEY}}
+if [[ -f /run/secrets/MKV_KEY ]];then
+  MKV_KEY=$(cat /run/secrets/MKV_KEY)
+fi
+
+if [[ -z ${MKV_KEY} ]]; then
+  MKV_KEY=${MKV_KEY:-${KEY}}
+fi
 
 # copy default settings
 mkdir -p /root/.MakeMKV
 if [[ ! -f /config/settings.conf ]] && [[ -n ${MKV_KEY} ]]; then
   echo "app_Key = \"${MKV_KEY}\"" >/config/settings.conf
   echo "No settings.conf. writing key to file."
-  cp /config/settings.conf /root/.MakeMKV/settings.conf
 fi
 
 # Updating Key if needed
 if [[ $(grep -c ${MKV_KEY} /config/settings.conf) -eq 0 ]]; then
   echo "app_Key = \"${MKV_KEY}\"" >/config/settings.conf
   echo "Found settings.conf. Replacing beta key file."
+fi
+
+#config key to root conf
+if [[ ! -f /root/.MakeMKV/settings.conf ]] || [[ $(md5sum /config/settings.conf | cut -f1 -d ' ') != $(md5sum /config/settings.conf | cut -f1 -d' ') ]] && [[ -n ${MKV_KEY} ]]; then
   cp /config/settings.conf /root/.MakeMKV/settings.conf
+  makemkvcon reg
 fi
 
 # permissions

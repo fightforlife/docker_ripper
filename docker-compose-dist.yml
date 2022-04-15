@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 services:
   ripper:
     image: edgd1er/docker-ripper:latest
@@ -32,3 +32,9 @@ services:
       - '/path/to/rips/:/out:rw'      # ripper's output dir.
     devices:
       - '/dev/sr0:/dev/sr0'
+    secrets:
+      - MKV_KEY
+
+secrets:
+  MKV_KEY:
+    file: ./MKV_KEY
