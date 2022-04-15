@@ -85,7 +85,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 WORKDIR /root
 # Install software
-# hadolint ignore=DL3008,DL3013,DL3042,SC2086
+# hadolint ignore=DL3003,DL3008,DL3013,DL3042,SC2086
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y \
     && apt-get -y install --no-install-recommends supervisor wget eject git curl gddrescue abcde eyed3 flac lame \
     mkcue speex vorbis-tools vorbisgain id3 id3v2 libavcodec-extra \
@@ -95,6 +95,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -
     && pip3 install wheel docopt flask waitress setuptools  \
     # add notification eml/pushover/pushbullet \
     && git clone https://github.com/ltpitt/python-simple-notifications.git \
+    && cd /root/python-simple-notifications && pip3 install . 2>&1 \
     && apt-get -y autoremove \
     && ln -s -f makemkvcon sdftool \
     # Configure user nobody to match unRAID's settings

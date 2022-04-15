@@ -38,20 +38,18 @@ getVersion() {
 
 setNotificationConfig() {
   # Email notification parameters
-  [[ -n ${EMAIL_SENDER} ]] && sed -i "s/= 'YOUR_EMAIL'/= '${EMAIL_SENDER}'/" ${NOTIFICATION_SETTINGS}
-  [[ -n ${EMAIL_PASSWORD} ]] && sed -i "s/= 'YOUR_PASSWORD'/= '${EMAIL_PASSWORD}'/" ${NOTIFICATION_SETTINGS}
-  [[ -n ${EMAIL_SERVER} ]] && sed -i "s/= 'smtp.gmail.com'/= '${EMAIL_SERVER}'/" ${NOTIFICATION_SETTINGS}
-  [[ -n ${EMAIL_SERVER_PORT} ]] && sed -i "s/= '587'/= '${EMAIL_SERVER_PORT}'/" ${NOTIFICATION_SETTINGS}
-  [[ -n ${EMAIL_DEBUG_LEVEL} ]] && sed -i "s/= '0'/= '${EMAIL_DEBUG_LEVEL}'/" ${NOTIFICATION_SETTINGS}
+  [[ -n ${EMAIL_SENDER} ]] && sed -i "s/= 'YOUR_EMAIL'/= '${EMAIL_SENDER}'/" ${NOTIFICATION_SETTINGS} || true
+  [[ -n ${EMAIL_PASSWORD} ]] && sed -i "s/= 'YOUR_PASSWORD'/= '${EMAIL_PASSWORD}'/" ${NOTIFICATION_SETTINGS} || true
+  [[ -n ${EMAIL_SERVER} ]] && sed -i "s/= 'smtp.gmail.com'/= '${EMAIL_SERVER}'/" ${NOTIFICATION_SETTINGS} || true
+  [[ -n ${EMAIL_SERVER_PORT} ]] && sed -i "s/= '587'/= '${EMAIL_SERVER_PORT}'/" ${NOTIFICATION_SETTINGS} || true
+  [[ -n ${EMAIL_DEBUG_LEVEL} ]] && sed -i "s/= '0'/= '${EMAIL_DEBUG_LEVEL}'/" ${NOTIFICATION_SETTINGS} || true
 
   # Push notification parameters (Pushover)
-  [[ -n ${PUSHOVER_APP_TOKEN} ]] && sed -i "s/PUSHOVER_APP_TOKEN = 'YOUR_APP_TOKEN'/PUSHOVER_APP_TOKEN = '${PUSHOVER_APP_TOKEN}'/" ${NOTIFICATION_SETTINGS}
-  [[ -n ${USER_KEY} ]] && sed -i "s/= 'YOUR_USER_KEY'/= '${USER_KEY}'/" ${NOTIFICATION_SETTINGS}
+  [[ -n ${PUSHOVER_APP_TOKEN} ]] && sed -i "s/PUSHOVER_APP_TOKEN = 'YOUR_APP_TOKEN'/PUSHOVER_APP_TOKEN = '${PUSHOVER_APP_TOKEN}'/" ${NOTIFICATION_SETTINGS} || true
+  [[ -n ${USER_KEY} ]] && sed -i "s/= 'YOUR_USER_KEY'/= '${USER_KEY}'/" ${NOTIFICATION_SETTINGS} || true
 
   # Push notification parameters (Pushbullet)
-  [[ -n ${PUSHBULLET_APP_TOKEN} ]] && sed -i "s/PUSHBULLET_APP_TOKEN = 'YOUR_APP_TOKEN'/PUSHBULLET_APP_TOKEN = '${PUSHBULLET_APP_TOKEN}'/" ${NOTIFICATION_SETTINGS}
-  cd /root/python-simple-notifications
-  pip3 install . 2>&1
+  [[ -n ${PUSHBULLET_APP_TOKEN} ]] && sed -i "s/PUSHBULLET_APP_TOKEN = 'YOUR_APP_TOKEN'/PUSHBULLET_APP_TOKEN = '${PUSHBULLET_APP_TOKEN}'/" ${NOTIFICATION_SETTINGS} || true
 }
 
 #Main
@@ -68,9 +66,7 @@ if [[ -f /run/secrets/MKV_KEY ]];then
   MKV_KEY=$(cat /run/secrets/MKV_KEY)
 fi
 
-if [[ -z ${MKV_KEY} ]]; then
-  MKV_KEY=${MKV_KEY:-${KEY}}
-fi
+MKV_KEY=${MKV_KEY:-${KEY}}
 
 # copy default settings
 mkdir -p /root/.MakeMKV
@@ -88,7 +84,7 @@ fi
 #config key to root conf
 if [[ ! -f /root/.MakeMKV/settings.conf ]] || [[ $(md5sum /config/settings.conf | cut -f1 -d ' ') != $(md5sum /config/settings.conf | cut -f1 -d' ') ]] && [[ -n ${MKV_KEY} ]]; then
   cp /config/settings.conf /root/.MakeMKV/settings.conf
-  makemkvcon reg
+  makemkvcon reg "" 2>/dev/null || true
 fi
 
 # permissions
