@@ -10,7 +10,7 @@ on:
 env:
   IMAGE: docker-ripper
   TAG: latest
-  MKVVERSION: 1.16.7
+  MKVVERSION: 1.17.0
   FDKVERSION: 2.0.2
 
 jobs:

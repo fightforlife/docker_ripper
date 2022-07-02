@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  MKVVERSION: 1.16.7
+  MKVVERSION: 1.17.0
 
 jobs:
   check-mkv_version:
