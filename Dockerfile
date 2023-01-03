@@ -5,7 +5,7 @@ ENV MKVVERSION=1.17.2
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN groupadd -g 1000 ripper && \
-    useradd -u 1000 -g ripper ripper
+    useradd -m -u 1000 -g ripper ripper
 
 #update repository
 RUN apt-get update && apt-get upgrade -y
