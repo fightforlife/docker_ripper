@@ -64,24 +64,24 @@ RUN apt-get install -y --no-install-recommends \
 
 #mount config dict
 COPY config /config
-VOLUME /config
 RUN chown -R ripper:ripper /config && \
     chmod +x /config/default/ripper.sh
 
+
 RUN mkdir /out
 RUN chown -R ripper:ripper /out
-VOLUME /out
 
 COPY init_ripper.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/init_ripper.sh
-
-
-USER ripper
 
 #install apprise for notifications
 RUN python3 -m ensurepip --upgrade
 RUN pip3 install apprise
 
+
+USER ripper
+VOLUME /out
+VOLUME /config
 CMD /usr/local/bin/init_ripper.sh
 
 
