@@ -68,6 +68,9 @@ VOLUME /config
 RUN chown -R ripper:ripper /config && \
     chmod +x /config/default/ripper.sh
 
+RUN mkdir /out
+RUN chown -R ripper:ripper /out
+VOLUME /out
 
 COPY init_ripper.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/init_ripper.sh
