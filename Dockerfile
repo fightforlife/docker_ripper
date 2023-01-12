@@ -10,8 +10,9 @@ RUN apt-get update && apt-get upgrade -y
 #install needed packages for ffmpeg download
 RUN apt-get install -y --no-install-recommends \
     tzdata curl grep wget lsb-release less eject \
-    gddrescue jq vainfo bzip2 build-essential pkg-config
-
+    gddrescue jq vainfo bzip2 build-essential pkg-config \
+    libdrm-dev cmake
+ 
 #install abcde and dependencies
 RUN apt-get install -y --no-install-recommends \
     abcde eyed3 flac lame mkcue speex vorbis-tools \
@@ -49,14 +50,14 @@ RUN cd && rm -rf intel-media-* && \
     cd && rm -rf intel-media-*
 
 #build latest Intel media sdk
-RUN cd && rm -rf intel-mediasdk-* && \
+RUN cd && rm -rf Intel-Media-SDK-MediaSDK-* && \
     curl -s https://api.github.com/repos/Intel-Media-SDK/MediaSDK/releases/latest \
     | jq -r '.tarball_url' \
     | wget -qi - && \
-    tar -xvf intel-mediasdk-* && cd intel-mediasdk-*/ && \ 
+    tar -xvf intel-mediasdk-* && cd Intel-Media-SDK-MediaSDK-*/ && \ 
     mkdir build && cd build/ && \
     cmake .. && make && make install && \
-    cd && rm -rf intel-mediasdk-*
+    cd && rm -rf Intel-Media-SDK-MediaSDK-*
 
 
 #install HandBrakeCLI dependencies (https://handbrake.fr/docs/en/latest/developer/install-dependencies-debian.html)
@@ -66,27 +67,25 @@ RUN apt-get install  -y --no-install-recommends \
     libjansson-dev liblzma-dev libmp3lame-dev libnuma-dev libogg-dev libopus-dev \
     libsamplerate-dev libspeex-dev libtheora-dev libtool libtool-bin libturbojpeg0-dev \
     libvorbis-dev libx264-dev libxml2-dev libvpx-dev m4 make meson nasm ninja-build \
-    patch pkg-config tar zlib1g-dev clang \
-    libva-dev libdrm-dev
+    patch pkg-config tar zlib1g-dev clang
+
 #build HandBrakeCLI
 RUN curl -s https://api.github.com/repos/HandBrake/HandBrake/releases/latest \
     | grep "browser.*HandBrake.*-source.tar.bz2" \
     | awk '!/.sig/' \
     | cut -d : -f 2,3 \
     | tr -d \" \
-    | wget -qi -
-RUN tar -xvf HandBrake*-source.tar.bz2
-RUN cd HandBrake*/ && \
+    | wget -qi - && \
+    tar -xvf HandBrake*-source.tar.bz2 && \
+    cd HandBrake*/ && \
     ./configure --launch-jobs=$(nproc) --launch --enable-qsv --disable-gtk && \
-    make --directory=build install
-RUN cd && rm -rf HandBrake*
-
+    make --directory=build install && \
+    cd && rm -rf HandBrake*
 
 #install build dependencies for MakeMKV
 RUN apt-get install -y --no-install-recommends \
     build-essential pkg-config libc6-dev libssl-dev libexpat1-dev libavcodec-dev \
     libgl1-mesa-dev qtbase5-dev zlib1g-dev
-
 #Download and build makemkv-oss
 RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-oss-${MKVVERSION}.tar.gz" && \
     tar xvf /tmp/makemkv-oss-${MKVVERSION}.tar.gz -C /tmp/  && \
@@ -96,7 +95,6 @@ RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-oss-${MKVVERSION}
     make install  && \
     make clean  && \
     rm /tmp/makemkv-oss-${MKVVERSION}.tar.gz
-    
 #Download and build makemkv-bin
 RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-bin-${MKVVERSION}.tar.gz" && \
     tar xvf /tmp/makemkv-bin-${MKVVERSION}.tar.gz -C /tmp/  && \
