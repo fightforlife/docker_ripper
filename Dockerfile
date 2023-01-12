@@ -1,3 +1,4 @@
+ARG DEBIAN_FRONTEND=noninteractive
 #use official ubuntu rolling image
 FROM ubuntu:rolling
 
