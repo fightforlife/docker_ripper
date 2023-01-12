@@ -1,30 +1,81 @@
-#use official slim python image
-FROM python:slim
+#use official ubuntu rolling image
+FROM ubuntu:rolling
 
 ENV MKVVERSION=1.17.2
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN groupadd -g 1000 ripper && \
-    useradd -m -u 1000 -g ripper ripper
 
 #update repository
 RUN apt-get update && apt-get upgrade -y
 
 #install needed packages for ffmpeg download
 RUN apt-get install -y --no-install-recommends \
-    tzdata curl grep wget lsb-release less eject gddrescue
+    tzdata curl grep wget lsb-release less eject gddrescue jq vainfo
 
-#install latest jellyfin-ffmpeg which includes fdk_aac and HWAcc
-RUN curl -s https://api.github.com/repos/jellyfin/jellyfin-ffmpeg/releases/latest \
-    | grep "browser.*jellyfin-ffmpeg.*$(lsb_release -cs)_$(dpkg --print-architecture).deb" \
-    | awk '!/.sha256sum/' \
+#install abcde and dependencies
+RUN apt-get install -y --no-install-recommends \
+    abcde eyed3 flac lame mkcue speex vorbis-tools vorbisgain id3 id3v2 
+
+#build latest Intel libva
+RUN cd && rm -rf libva-*
+RUN curl -s https://api.github.com/repos/intel/libva/releases/latest \
+    | grep "browser.*libva-.*.tar.bz2" \
+    | awk '!/.sha1sum/' \
     | cut -d : -f 2,3 \
     | tr -d \" \
     | wget -qi -
+RUN tar -xvf libva-*.tar.bz2 && cd libva-*/
+RUN ./configure && make && make install
+RUN cd && rm -rf libva-*
 
-#install ffmpeg (dependencies will be automatically resolved by apt)
-RUN apt-get install -y --no-install-recommends ./jellyfin-ffmpeg*.deb && \
-    ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /bin/ffmpeg
+#build latest Intel gmmlib
+RUN cd && rm -rf intel-gmmlib-*
+RUN wget https://api.github.com/repos/intel/gmmlib/tarball/refs/tags/$(curl "https://api.github.com/repos/intel/gmmlib/tags" | jq -r '.[0].name')
+RUN tar -xvf intel-gmmlib-* && cd intel-gmmlib-*/
+RUN mkdir build && cd build/
+RUN cmake -DCMAKE_BUILD_TYPE=Release ..
+RUN make -j"$(nproc)" && make install
+RUN cd && rm -rf intel-gmmlib-*
+
+#build latest Intel media driver
+RUN cd && rm -rf intel-media-*
+RUN curl -s https://api.github.com/repos/intel/media-driver/releases/latest \
+    | jq -r '.tarball_url' \
+    | wget -qi -
+RUN tar -xvf intel-media-* && cd intel-media-*/
+RUN mkdir build && cd build/
+RUN cmake .. && make -j"$(nproc)" && make install
+RUN cd && rm -rf intel-media-*
+
+#build latest Intel media sdk
+RUN cd && rm -rf intel-mediasdk-*
+RUN curl -s https://api.github.com/repos/Intel-Media-SDK/MediaSDK/releases/latest \
+    | jq -r '.tarball_url' \
+    | wget -qi -
+RUN tar -xvf intel-mediasdk-* && cd intel-mediasdk-*/
+RUN mkdir build && cd build/
+RUN cmake .. && make && make install
+RUN cd && rm -rf intel-mediasdk-*
+
+
+#install HandBrakeCLI dependencies (https://handbrake.fr/docs/en/latest/developer/install-dependencies-debian.html)
+RUN apt-get install  -y --no-install-recommends \
+    autoconf automake autopoint appstream build-essential cmake git libass-dev \
+    libbz2-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libharfbuzz-dev \
+    libjansson-dev liblzma-dev libmp3lame-dev libnuma-dev libogg-dev libopus-dev \
+    libsamplerate-dev libspeex-dev libtheora-dev libtool libtool-bin libturbojpeg0-dev \
+    libvorbis-dev libx264-dev libxml2-dev libvpx-dev m4 make meson nasm ninja-build \
+    patch pkg-config tar zlib1g-dev clang \
+    libva-dev libdrm-dev
+#build HandBrakeCLI
+RUN curl -s https://api.github.com/repos/HandBrake/HandBrake/releases/latest \
+    | grep "browser.*HandBrake.*-source.tar.bz2" \
+    | awk '!/.sig/' \
+    | cut -d : -f 2,3 \
+    | tr -d \" \
+    | wget -qi -
+RUN tar -xvf HandBrake*-source.tar.bz2 && cd HandBrake*/
+RUN ./configure --launch-jobs=$(nproc) --launch --enable-qsv --disable-gtk
+RUN make --directory=build install && \
+    cd && rm -rf HandBrake*
 
 
 #install build dependencies for MakeMKV
@@ -53,14 +104,8 @@ RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-bin-${MKVVERSION}
     rm /tmp/makemkv-bin-${MKVVERSION}.tar.gz
 
 
-#install abcde and dependencies
-RUN apt-get install -y --no-install-recommends \
-    abcde eyed3 flac lame mkcue speex vorbis-tools vorbisgain id3 id3v2 
-
-#install HandBrakeCLI
-RUN apt-get install -y --no-install-recommends \
-    handbrake-cli
-
+RUN groupadd -g 1000 ripper && \
+    useradd -m -u 1000 -g ripper ripper
 
 #mount config dict
 COPY config /config
@@ -74,14 +119,7 @@ RUN chown -R ripper:ripper /out
 COPY init_ripper.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/init_ripper.sh
 
-#install apprise for notifications
-RUN python3 -m ensurepip --upgrade
-RUN pip3 install apprise
-
-
 USER ripper
 VOLUME /out
 VOLUME /config
 CMD /usr/local/bin/init_ripper.sh
-
-
