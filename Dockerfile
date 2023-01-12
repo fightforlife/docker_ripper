@@ -22,17 +22,17 @@ RUN curl -s https://api.github.com/repos/intel/libva/releases/latest \
     | cut -d : -f 2,3 \
     | tr -d \" \
     | wget -qi -
-RUN tar -xvf libva-*.tar.bz2 && cd libva-*/
-RUN ./configure && make && make install
+RUN tar -xvf libva-*.tar.bz2
+RUN cd libva-*/ && ./configure && make && make install
 RUN cd && rm -rf libva-*
 
 #build latest Intel gmmlib
 RUN cd && rm -rf intel-gmmlib-*
 RUN wget https://api.github.com/repos/intel/gmmlib/tarball/refs/tags/$(curl "https://api.github.com/repos/intel/gmmlib/tags" | jq -r '.[0].name')
-RUN tar -xvf intel-gmmlib-* && cd intel-gmmlib-*/
-RUN mkdir build && cd build/
-RUN cmake -DCMAKE_BUILD_TYPE=Release ..
-RUN make -j"$(nproc)" && make install
+RUN tar -xvf intel-gmmlib-*
+RUN cd intel-gmmlib-*/ && mkdir build && cd build/ && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j"$(nproc)" && make install
 RUN cd && rm -rf intel-gmmlib-*
 
 #build latest Intel media driver
@@ -40,9 +40,9 @@ RUN cd && rm -rf intel-media-*
 RUN curl -s https://api.github.com/repos/intel/media-driver/releases/latest \
     | jq -r '.tarball_url' \
     | wget -qi -
-RUN tar -xvf intel-media-* && cd intel-media-*/
-RUN mkdir build && cd build/
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN tar -xvf intel-media-*
+RUN cd intel-media-*/ && mkdir build && cd build/ && \
+    cmake .. && make -j"$(nproc)" && make install
 RUN cd && rm -rf intel-media-*
 
 #build latest Intel media sdk
@@ -50,9 +50,9 @@ RUN cd && rm -rf intel-mediasdk-*
 RUN curl -s https://api.github.com/repos/Intel-Media-SDK/MediaSDK/releases/latest \
     | jq -r '.tarball_url' \
     | wget -qi -
-RUN tar -xvf intel-mediasdk-* && cd intel-mediasdk-*/
-RUN mkdir build && cd build/
-RUN cmake .. && make && make install
+RUN tar -xvf intel-mediasdk-*
+RUN cd intel-mediasdk-*/ && mkdir build && cd build/ && \
+    cmake .. && make && make install
 RUN cd && rm -rf intel-mediasdk-*
 
 
@@ -72,10 +72,11 @@ RUN curl -s https://api.github.com/repos/HandBrake/HandBrake/releases/latest \
     | cut -d : -f 2,3 \
     | tr -d \" \
     | wget -qi -
-RUN tar -xvf HandBrake*-source.tar.bz2 && cd HandBrake*/
-RUN ./configure --launch-jobs=$(nproc) --launch --enable-qsv --disable-gtk
-RUN make --directory=build install && \
-    cd && rm -rf HandBrake*
+RUN tar -xvf HandBrake*-source.tar.bz2
+RUN cd HandBrake*/ && \
+    ./configure --launch-jobs=$(nproc) --launch --enable-qsv --disable-gtk && \
+    make --directory=build install
+RUN cd && rm -rf HandBrake*
 
 
 #install build dependencies for MakeMKV
