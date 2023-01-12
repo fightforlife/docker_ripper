@@ -1,4 +1,5 @@
 ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
 #use official ubuntu rolling image
 FROM ubuntu:rolling
 
