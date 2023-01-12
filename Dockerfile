@@ -8,7 +8,7 @@ RUN apt-get update && apt-get upgrade -y
 
 #install needed packages for ffmpeg download
 RUN apt-get install -y --no-install-recommends \
-    tzdata curl grep wget lsb-release less eject gddrescue jq vainfo
+    tzdata curl grep wget lsb-release less eject gddrescue jq vainfo bzip2
 
 #install abcde and dependencies
 RUN apt-get install -y --no-install-recommends \
