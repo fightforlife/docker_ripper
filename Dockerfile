@@ -10,11 +10,12 @@ RUN apt-get update && apt-get upgrade -y
 #install needed packages for ffmpeg download
 RUN apt-get install -y --no-install-recommends \
     tzdata curl grep wget lsb-release less eject \
-    gddrescue jq vainfo bzip2 build-essential
+    gddrescue jq vainfo bzip2 build-essential pkg-config
 
 #install abcde and dependencies
 RUN apt-get install -y --no-install-recommends \
-    abcde eyed3 flac lame mkcue speex vorbis-tools vorbisgain id3 id3v2 
+    abcde eyed3 flac lame mkcue speex vorbis-tools \
+    vorbisgain id3 id3v2 
 
 #build latest Intel libva
 RUN cd && rm -rf libva-* && \
