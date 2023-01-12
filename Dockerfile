@@ -8,52 +8,53 @@ RUN apt-get update && apt-get upgrade -y
 
 #install needed packages for ffmpeg download
 RUN apt-get install -y --no-install-recommends \
-    tzdata curl grep wget lsb-release less eject gddrescue jq vainfo bzip2
+    tzdata curl grep wget lsb-release less eject \
+    gddrescue jq vainfo bzip2 build-essential
 
 #install abcde and dependencies
 RUN apt-get install -y --no-install-recommends \
     abcde eyed3 flac lame mkcue speex vorbis-tools vorbisgain id3 id3v2 
 
 #build latest Intel libva
-RUN cd && rm -rf libva-*
-RUN curl -s https://api.github.com/repos/intel/libva/releases/latest \
+RUN cd && rm -rf libva-* && \
+    curl -s https://api.github.com/repos/intel/libva/releases/latest \
     | grep "browser.*libva-.*.tar.bz2" \
     | awk '!/.sha1sum/' \
     | cut -d : -f 2,3 \
     | tr -d \" \
-    | wget -qi -
-RUN tar -xvf libva-*.tar.bz2
-RUN cd libva-*/ && ./configure && make && make install
-RUN cd && rm -rf libva-*
+    | wget -qi - && \
+    tar -xvf libva-*.tar.bz2 && cd libva-*/ && \
+    ./configure && make && make install && \
+    cd && rm -rf libva-*
 
 #build latest Intel gmmlib
-RUN cd && rm -rf intel-gmmlib-*
-RUN wget https://api.github.com/repos/intel/gmmlib/tarball/refs/tags/$(curl "https://api.github.com/repos/intel/gmmlib/tags" | jq -r '.[0].name')
-RUN tar -xvf intel-gmmlib-*
-RUN cd intel-gmmlib-*/ && mkdir build && cd build/ && \
+RUN cd && rm -rf intel-gmmlib-* && \
+    wget https://api.github.com/repos/intel/gmmlib/tarball/refs/tags/$(curl "https://api.github.com/repos/intel/gmmlib/tags" | jq -r '.[0].name') && \
+    tar -xvf intel-gmmlib-* && cd intel-gmmlib-*/ && \
+    mkdir build && cd build/ && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j"$(nproc)" && make install
-RUN cd && rm -rf intel-gmmlib-*
+    make -j"$(nproc)" && make install && \
+    cd && rm -rf intel-gmmlib-*
 
 #build latest Intel media driver
-RUN cd && rm -rf intel-media-*
-RUN curl -s https://api.github.com/repos/intel/media-driver/releases/latest \
+RUN cd && rm -rf intel-media-* && \
+    curl -s https://api.github.com/repos/intel/media-driver/releases/latest \
     | jq -r '.tarball_url' \
-    | wget -qi -
-RUN tar -xvf intel-media-*
-RUN cd intel-media-*/ && mkdir build && cd build/ && \
-    cmake .. && make -j"$(nproc)" && make install
-RUN cd && rm -rf intel-media-*
+    | wget -qi - && \
+    tar -xvf intel-media-* && cd intel-media-*/ && \
+    mkdir build && cd build/ && \
+    cmake .. && make -j"$(nproc)" && make install && \
+    cd && rm -rf intel-media-*
 
 #build latest Intel media sdk
-RUN cd && rm -rf intel-mediasdk-*
-RUN curl -s https://api.github.com/repos/Intel-Media-SDK/MediaSDK/releases/latest \
+RUN cd && rm -rf intel-mediasdk-* && \
+    curl -s https://api.github.com/repos/Intel-Media-SDK/MediaSDK/releases/latest \
     | jq -r '.tarball_url' \
-    | wget -qi -
-RUN tar -xvf intel-mediasdk-*
-RUN cd intel-mediasdk-*/ && mkdir build && cd build/ && \
-    cmake .. && make && make install
-RUN cd && rm -rf intel-mediasdk-*
+    | wget -qi - && \
+    tar -xvf intel-mediasdk-* && cd intel-mediasdk-*/ && \ 
+    mkdir build && cd build/ && \
+    cmake .. && make && make install && \
+    cd && rm -rf intel-mediasdk-*
 
 
 #install HandBrakeCLI dependencies (https://handbrake.fr/docs/en/latest/developer/install-dependencies-debian.html)
