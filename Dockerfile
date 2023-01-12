@@ -1,10 +1,9 @@
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Europe/Berlin
 #use official ubuntu rolling image
 FROM ubuntu:rolling
 
 ENV MKVVERSION=1.17.2
-
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
 #update repository
 RUN apt-get update && apt-get upgrade -y
 
