@@ -16,7 +16,7 @@ RUN apt-get install -y --no-install-recommends \
 #install abcde and dependencies
 RUN apt-get install -y --no-install-recommends \
     abcde eyed3 flac lame mkcue speex vorbis-tools \
-    vorbisgain id3 id3v2 
+    vorbisgain id3 id3v2 glyrc
 
 #build latest Intel libva
 RUN cd && rm -rf libva-* && \

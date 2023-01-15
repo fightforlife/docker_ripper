@@ -32,7 +32,6 @@ BAD_RESPONSE=0
 ejectDrive() {
   if eject -v $DRIVE | grep 'whole-disk' >>/dev/null; then
     echo "First attempt at Ejecting Disk Succeeded"
-    exit 1
   else
     echo "First Attempt At Ejecting Disk Failed. Attempting Alternative Method." >>$LOGFILE 2>&1
     echo "$(date "+%d.%m.%Y %T") : First Attempt At Ejecting Disk Failed. Trying Alternative Method."
@@ -40,7 +39,6 @@ ejectDrive() {
     sdparm --command=unlock $DRIVE
     sleep 1
     sdparm --command=eject $DRIVE
-    exit 1
   fi
 }
 
@@ -98,9 +96,9 @@ while true; do
     ejectDrive
   fi
 
-  # if [ $EMPTY = 'DRV:0,0,999,0,"' ]; then
-  #  echo "$(date "+%d.%m.%Y %T") : No Disc"; &>/dev/null
-  # fi
+  if [ "$EMPTY" = 'DRV:0,0,999,0,"' ]; then
+    echo "$(date "+%d.%m.%Y %T") : No Disc"; &>/dev/null
+  fi
   if [ "$OPEN" = 'DRV:0,1,999,0,"' ]; then
     echo "$(date "+%d.%m.%Y %T") : Disk tray open"
   fi
@@ -167,7 +165,7 @@ while true; do
       else
         # MP3 & FLAC
         echo "$(date "+%d.%m.%Y %T") : CD detected: Saving MP3 and FLAC"
-        /usr/bin/abcde -d "$DRIVE" -c /config/abcde.conf -N -x -l >>$LOGFILE 2>&1
+        /usr/bin/abcde -d "$DRIVE" -c /config/abcde.conf
       fi
       echo "$(date "+%d.%m.%Y %T") : Done! Ejecting Disk"
       notify
@@ -195,5 +193,5 @@ while true; do
     fi
   fi
   # Wait a minute
-  sleep 1m
+  sleep 15s
 done
