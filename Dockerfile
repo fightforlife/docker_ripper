@@ -112,16 +112,13 @@ RUN groupadd -g 1000 ripper && \
 #mount config dict
 COPY config /config
 RUN chown -R ripper:ripper /config && \
-    chmod +x /config/default/ripper.sh
-
+    chmod +x /config/default/ripper.sh && \
+    chmod +x /config/default/init_ripper.sh
 
 RUN mkdir /out
 RUN chown -R ripper:ripper /out
 
-COPY init_ripper.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/init_ripper.sh
-
 USER ripper
 VOLUME /out
 VOLUME /config
-CMD /usr/local/bin/init_ripper.sh
+CMD /config/default/init_ripper.sh
