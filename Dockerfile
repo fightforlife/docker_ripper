@@ -1,7 +1,6 @@
 #use official ubuntu rolling image
 FROM ubuntu:rolling
 
-ENV MKVVERSION=1.17.2
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin
 #update repository
@@ -87,7 +86,10 @@ RUN apt-get install -y --no-install-recommends \
     build-essential pkg-config libc6-dev libssl-dev libexpat1-dev libavcodec-dev \
     libgl1-mesa-dev qtbase5-dev zlib1g-dev
 #Download and build makemkv-oss
-RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-oss-${MKVVERSION}.tar.gz" && \
+
+
+RUN export MKVVERSION=$(curl -s https://www.makemkv.com/download/ | grep ">MakeMKV *.* for Windows<" | grep -Eo '[0-9]\.[0-9]+\.[0-9]' | head -1) && \
+    wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-oss-${MKVVERSION}.tar.gz" && \
     tar xvf /tmp/makemkv-oss-${MKVVERSION}.tar.gz -C /tmp/  && \
     cd /tmp/makemkv-oss-${MKVVERSION}   && \
     ./configure  && \
