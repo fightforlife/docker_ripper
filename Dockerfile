@@ -85,9 +85,9 @@ RUN curl -s https://api.github.com/repos/HandBrake/HandBrake/releases/latest \
 RUN apt-get install -y --no-install-recommends \
     build-essential pkg-config libc6-dev libssl-dev libexpat1-dev libavcodec-dev \
     libgl1-mesa-dev qtbase5-dev zlib1g-dev
+
+
 #Download and build makemkv-oss
-
-
 RUN export MKVVERSION=$(curl -s https://www.makemkv.com/download/ | grep ">MakeMKV *.* for Windows<" | grep -Eo '[0-9]\.[0-9]+\.[0-9]' | head -1) && \
     wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-oss-${MKVVERSION}.tar.gz" && \
     tar xvf /tmp/makemkv-oss-${MKVVERSION}.tar.gz -C /tmp/  && \
@@ -97,8 +97,10 @@ RUN export MKVVERSION=$(curl -s https://www.makemkv.com/download/ | grep ">MakeM
     make install  && \
     make clean  && \
     rm /tmp/makemkv-oss-${MKVVERSION}.tar.gz
+
 #Download and build makemkv-bin
-RUN wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-bin-${MKVVERSION}.tar.gz" && \
+RUN export MKVVERSION=$(curl -s https://www.makemkv.com/download/ | grep ">MakeMKV *.* for Windows<" | grep -Eo '[0-9]\.[0-9]+\.[0-9]' | head -1) && \
+    wget -nv -P /tmp/ "http://www.makemkv.com/download/makemkv-bin-${MKVVERSION}.tar.gz" && \
     tar xvf /tmp/makemkv-bin-${MKVVERSION}.tar.gz -C /tmp/  && \
     cd /tmp/makemkv-bin-${MKVVERSION}   && \
     mkdir tmp && touch tmp/eula_accepted &&\
